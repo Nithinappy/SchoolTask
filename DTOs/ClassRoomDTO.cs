@@ -22,8 +22,11 @@ public record ClassRoomDTO
 public record ClassRoomCreateDTO
 {
 
+
     [JsonPropertyName("Class_name")]
     [Required]
+    [MinLength(3)]
+    [MaxLength(50)]
     public string Name { get; set; }
 }
 

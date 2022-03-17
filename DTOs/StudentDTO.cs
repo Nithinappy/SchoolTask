@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 
 namespace SchoolTask.DTOs;
@@ -26,12 +28,27 @@ public record StudentDTO
 
 public record StudentCreateDTO
 {
-
+    [JsonPropertyName("first_name")]
+    [Required]
+    [MinLength(3)]
+    [MaxLength(50)]
     public string FirstName { get; set; }
+
+    [JsonPropertyName("last_name")]
+    [Required]
+    [MinLength(3)]
+    [MaxLength(50)]
     public string LastName { get; set; }
+    [JsonPropertyName("gender")]
+    [Required]
     public string Gender { get; set; }
+    [JsonPropertyName("date_Of_birth")]
+    [Required]
     public DateTimeOffset DateOfBirth { get; set; }
+    [JsonPropertyName("parent_contact")]
+    [Required]
     public long ParentContact { get; set; }
+    [Required]
     public long ClassId { get; set; }
 
 
