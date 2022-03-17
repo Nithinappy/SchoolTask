@@ -22,9 +22,9 @@ public class StudentController : ControllerBase
         
     }
     [HttpGet]
-    public async Task<ActionResult<List<StudentDTO>>> GetAllStudents()
+    public async Task<ActionResult<List<StudentDTO>>> GetAllStudents([FromQuery] StudentParameter studentParameter)
     {
-        var StudentsList = await _student.GetAllStudents();
+        var StudentsList = await _student.GetAllStudents(studentParameter);
 
         var dtoList = StudentsList.Select(x => x.asDto);
 

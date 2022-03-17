@@ -2,20 +2,20 @@ using Dapper;
 using SchoolTask.Repositories;
 using SchoolTask.Models;
 using SchoolTask.Utilities;
-
+using SchoolTask.Helpers;
 
 namespace SchoolTask.Repositories;
 public interface IStudentRepository
 {
-    Task<List<Student>> GetAllStudents();
+    Task<List<Student>> GetAllStudents(StudentParameter studentParameter);
     Task<Student> GetStudentById(long Id);
     Task<Student> CreateStudent(Student item);
     Task<bool> UpdateStudent(Student item);
     Task<Student> DeleteStudent(long Id);
-    
+
     Task<List<Student>> GetClassRoomStudentsById(long Id);
     Task<List<Student>> GetTeacherStudentsById(long Id);
-    
+
 
 
 }
@@ -46,7 +46,7 @@ public class StudentRepository : BaseRepository, IStudentRepository
         throw new NotImplementedException();
     }
 
-    public async Task<List<Student>> GetAllStudents()
+    public async Task<List<Student>> GetAllStudents(StudentParameter studentParameter)
     {
 
         // Query
@@ -54,12 +54,15 @@ public class StudentRepository : BaseRepository, IStudentRepository
 
         List<Student> res;
         using (var con = NewConnection)
-            res = (await con.QueryAsync<Student>(query)).AsList(); 
-       
+            res = (await con.QueryAsync<Student>(query))
+            .Skip((studentParameter.PageNumber - 1) * studentParameter.PageSize)
+            .Take(studentParameter.PageSize)
+            .AsList();
+
         return res;
     }
 
-   
+
     public async Task<Student> GetStudentById(long Id)
     {
         var query = $@"SELECT * FROM ""{TableNames.student}"" 
@@ -90,17 +93,17 @@ public class StudentRepository : BaseRepository, IStudentRepository
         var query = $@"SELECT * FROM {TableNames.student} WHERE class_id = @Id";
 
         using (var con = NewConnection)
-           return (await con.QueryAsync<Student>(query)).AsList();
+            return (await con.QueryAsync<Student>(query)).AsList();
     }
 
     public async Task<List<Student>> GetTeacherStudentsById(long Id)
     {
-        var query =  $@"SELECT * FROM {TableNames.student_teacher} st
+        var query = $@"SELECT * FROM {TableNames.student_teacher} st
         LEFT JOIN {TableNames.student} s ON s.id = st.student_id 
             WHERE st.teacher_id = @Id";
 
         using (var con = NewConnection)
-           return (await con.QueryAsync<Student>(query,new {Id})).AsList();
+            return (await con.QueryAsync<Student>(query, new { Id })).AsList();
     }
 
 
