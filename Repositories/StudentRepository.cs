@@ -7,7 +7,7 @@ using SchoolTask.Helpers;
 namespace SchoolTask.Repositories;
 public interface IStudentRepository
 {
-    Task<List<Student>> GetAllStudents(StudentParameter studentParameter);
+    Task<List<Student>> GetAllStudents(int pageNumber, int pageSize);
     Task<Student> GetStudentById(long Id);
     Task<Student> CreateStudent(Student item);
     Task<bool> UpdateStudent(Student item);
@@ -46,18 +46,20 @@ public class StudentRepository : BaseRepository, IStudentRepository
         throw new NotImplementedException();
     }
 
-    public async Task<List<Student>> GetAllStudents(StudentParameter studentParameter)
+    public async Task<List<Student>> GetAllStudents(int pageNumber, int Limit)
     {
 
         // Query
-        var query = $@"SELECT * FROM ""{TableNames.student}""";
+        var query = $@"SELECT * FROM ""{TableNames.student}"" ORDER BY Id LIMIT @Limit OFFSET @PageNumber"; ;
 
         List<Student> res;
         using (var con = NewConnection)
-            res = (await con.QueryAsync<Student>(query))
-            .Skip((studentParameter.PageNumber - 1) * studentParameter.PageSize)
-            .Take(studentParameter.PageSize)
-            .AsList();
+            res = (await con.QueryAsync<Student>(query, new { @PageNumber = (pageNumber - 1) * Limit, Limit })).AsList();
+        // using (var con = NewConnection)
+        //     res = (await con.QueryAsync<Student>(query))
+        //     .Skip((studentParameter.PageNumber - 1) * studentParameter.PageSize)
+        //     .Take(studentParameter.PageSize)
+        //     .AsList();
 
         return res;
     }

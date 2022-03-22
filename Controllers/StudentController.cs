@@ -13,20 +13,24 @@ public class StudentController : ControllerBase
     private readonly IStudentRepository _student;
     private readonly ITeacherRepository _teacher;
     private readonly ISubjectRepository _subject;
-    public StudentController(ILogger<StudentController> logger, IStudentRepository student,ITeacherRepository teacher,ISubjectRepository subject)
+    public StudentController(ILogger<StudentController> logger, IStudentRepository student, ITeacherRepository teacher, ISubjectRepository subject)
     {
         _logger = logger;
         _student = student;
-        _subject=subject;
+        _subject = subject;
         _teacher = teacher;
-        
+
     }
     [HttpGet]
-    public async Task<ActionResult<List<StudentDTO>>> GetAllStudents([FromQuery] StudentParameter studentParameter)
+    public async Task<ActionResult<List<StudentDTO>>> GetAllStudents(int pageNumber,int pageSize)
     {
-        var StudentsList = await _student.GetAllStudents(studentParameter);
+        var StudentsList = await _student.GetAllStudents(pageNumber,pageSize);
+
+    
 
         var dtoList = StudentsList.Select(x => x.asDto);
+
+
 
         return Ok(dtoList);
     }
@@ -57,11 +61,11 @@ public class StudentController : ControllerBase
             // first_name,last_name,Student_name,email,mobile,bio,address,passcode
             FirstName = Data.FirstName.Trim(),
             LastName = Data.LastName.Trim(),
-            DateOfBirth=Data.DateOfBirth.UtcDateTime,
-            Gender =Data.Gender,
-            ParentContact=Data.ParentContact,
-            ClassId=Data.ClassId
-           
+            DateOfBirth = Data.DateOfBirth.UtcDateTime,
+            Gender = Data.Gender,
+            ParentContact = Data.ParentContact,
+            ClassId = Data.ClassId
+
         };
 
         var createdStudent = await _student.CreateStudent(toCreateStudent);
@@ -82,7 +86,7 @@ public class StudentController : ControllerBase
 
             ClassId = Data.ClassId ?? existing.ClassId,
             LastName = Data.LastName ?? existing.LastName,
-            ParentContact =Data.ParentContact ?? existing.ParentContact
+            ParentContact = Data.ParentContact ?? existing.ParentContact
 
         };
 
